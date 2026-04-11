@@ -10,12 +10,11 @@ requestRouter.post("/request/send/:status/:toUserId", userAuth, async (req,res)=
         const status = req.params.status;
 
 //         console.log("fromUserId:", fromUserId);
-// console.log("length:", fromUserId?.length);
+//         console.log("length:", fromUserId?.length);
 
         const alloweStatus = ["ignored", "interested"];
         if(!alloweStatus.includes(status)){
           return res.status(400).json({message:"Invalid status type "+ status})
-
         }
 
         const existingConnectionRequest = await ConnectionRequest.findOne({

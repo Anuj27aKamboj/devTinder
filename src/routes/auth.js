@@ -31,9 +31,23 @@ authRouter.post("/signup", async (req, res) => {
       password: passwordHash,
     }); //Creating a new instance
 
-    await user.save(); //saving
+    await user.save();
+
+    // ✅ Generate token
+    const token = await user.getJWT();
+
+    // ✅ Set cookie
+    res.cookie("token", token, {
+      httpOnly: true,
+
+      secure: false, // true only in production (HTTPS)
+      sameSite: "lax", // NOT "strict" locally
+    });
+
+    // ✅ Send response
     res.status(201).json({
       message: "User created successfully",
+      user: user.getSafeData(),
     });
   } catch (err) {
     res.status(400).send("Uh oh! Something feels wrong: " + err.message);
@@ -61,22 +75,22 @@ authRouter.post("/login", async (req, res) => {
       res.cookie("token", token, {
         expires: new Date(Date.now() + 3600000),
         httpOnly: true,
-        secure: true, // only HTTPS (production)
-        sameSite: "strict", // prevents CSRF
+        secure: false, // ❗ required for localhost
+        sameSite: "lax", // ❗ allow cross-origin (React ↔ backend)
       });
 
+      // user = user.select(USER_SAFE_DATA);
       res.json({
         message: "Login Successful",
-        user: {
-          firstName: user.firstName,
-          emailId: user.emailId,
-        },
+        user: user.getSafeData(),
       });
     } else {
       throw new Error("Invalid Credentials");
     }
   } catch (err) {
-    res.status(400).send("Uh oh! Something feels wrong: " + err.message);
+    res
+      .status(401)
+      .json({ message: "Uh oh! Something feels wrong: " + err.message });
   }
 });
 

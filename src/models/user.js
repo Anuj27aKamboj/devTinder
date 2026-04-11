@@ -70,6 +70,7 @@ const userSchema = new mongoose.Schema(
     gender: {
       type: String,
       lowercase:true,
+      trim: true,
       enum: {
         values: ["male", "female", "others"],
         message: "{VALUE} is not a valid gender",
@@ -79,7 +80,7 @@ const userSchema = new mongoose.Schema(
     photoURL: {
       type: String,
       default:
-        "https://pixabay.com/vectors/blank-profile-picture-mystery-man-973460/",
+        "https://img.icons8.com/?size=100&id=UkLBG0sZoWV0&format=png&color=000000",
       validate(value) {
         //   if (
         /*     !/^https?:\/\/.+\..+/.test(value)*/
@@ -128,6 +129,19 @@ userSchema.methods.getJWT = async function () {
 
 userSchema.methods.validatePassword = async function (passwordInputByUser) {
   return await bcrypt.compare(passwordInputByUser, this.password);
+};
+
+userSchema.methods.getSafeData = function () {
+  return {
+    _id: this._id,
+    firstName: this.firstName,
+    lastName: this.lastName,
+    photoURL: this.photoURL,
+    age: this.age,
+    gender: this.gender,
+    about: this.about,
+    skills: this.skills,
+  };
 };
 
 module.exports = mongoose.model("User", userSchema);

@@ -9,11 +9,11 @@ const connectionRequestSchema = new mongoose.Schema(
     },
     toUserId: {
       type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
       required: true,
     },
     status: {
       type: String,
-      ref: "User",
       lowercase:true, 
       enum: {
         values: ["ignored", "interested", "rejected", "accepted"],
@@ -26,7 +26,7 @@ const connectionRequestSchema = new mongoose.Schema(
   },
 );
 
-connectionRequestSchema.index({fromUserId:1, toUserId:1});
+connectionRequestSchema.index({fromUserId:1, toUserId:1, status: 1 });
 
 connectionRequestSchema.pre("save", function(){
     if(this.fromUserId.equals(this.toUserId)){

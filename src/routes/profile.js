@@ -1,62 +1,72 @@
 const express = require("express");
 const profileRouter = express.Router();
 const { userAuth } = require("../middleware/userAuth");
-const { validateProfileData} = require("../utils/validation");
+const { validateProfileData } = require("../utils/validation");
 const bcrypt = require("bcrypt");
 const validator = require("validator");
 
-profileRouter.get("/profile/view",userAuth, async (req, res) => {
+profileRouter.get("/profile/view", userAuth, async (req, res) => {
   try {
     const user = req.user;
-    res.send(user);
+    res.json({
+      user: user.getSafeData(),
+    });
   } catch (err) {
-    res.status(400).send("Uh oh! Something feels wrong: "+err.message);
+    res.status(400).send("Uh oh! Something feels wrong: " + err.message);
   }
 });
 
-profileRouter.patch("/profile/edit", userAuth, async (req,res) => {
-   try{
-    if(!validateProfileData(req)){
-    throw new Error("Invalid Edit Request");
-   }
-   const loggedInUser = req.user;
-  
-   Object.keys(req.body).forEach(key => loggedInUser[key] = req.body[key])
-   await loggedInUser.save();
+profileRouter.patch("/profile/edit", userAuth, async (req, res) => {
+  try {
+    if (!validateProfileData(req)) {
+      throw new Error("Invalid Edit Request");
+    }
+    const loggedInUser = req.user;
 
-   res.json({message : `${loggedInUser.firstName} updated profile`, data: loggedInUser})
-   res.send()
-  }catch (err) {
-    res.status(400).send("Uh oh! Something feels wrong: "+err.message);
+    Object.keys(req.body).forEach((key) => (loggedInUser[key] = req.body[key]));
+    await loggedInUser.save();
+
+    res.json({
+      message: `${loggedInUser.firstName} updated profile`,
+      user: loggedInUser,
+    });
+    res.send();
+  } catch (err) {
+    res
+      .status(400)
+      .send({ message: "Uh oh! Something feels wrong: " + err.message });
   }
-})
+});
 
-profileRouter.patch("/profile/edit/password", userAuth, async (req,res) => {
-   try{
-    const {currentPassword, newPassword} = req.body;
+profileRouter.patch("/profile/edit/password", userAuth, async (req, res) => {
+  try {
+    const { currentPassword, newPassword } = req.body;
 
     //Input validation
-    if(!currentPassword || !newPassword){
-      return res.status(400).send("All fields are required")
+    if (!currentPassword || !newPassword) {
+      return res.status(400).send("All fields are required");
     }
 
     //Verify Current Password
-    const isMatchingOldPassword = await req.user.validatePassword(currentPassword)
+    const isMatchingOldPassword =
+      await req.user.validatePassword(currentPassword);
     // console.log(isMatchingOldPassword)
-    if(!isMatchingOldPassword){
-      return res.status(401).send("Current Password is incorrect")
+    if (!isMatchingOldPassword) {
+      return res.status(401).send("Current Password is incorrect");
     }
 
     //Prevent reuse of old password
-    const isSamePassword = await req.user.validatePassword(newPassword)
-    if(isSamePassword){
-      return res.status(401).send("New Password cannot be same as old password")
+    const isSamePassword = await req.user.validatePassword(newPassword);
+    if (isSamePassword) {
+      return res
+        .status(401)
+        .send("New Password cannot be same as old password");
     }
     // console.log(isSamePassword)
 
     //Validate strength of new password
-    if(!validator.isStrongPassword(newPassword)){
-      return res.status(401).send("Enter a strong password")
+    if (!validator.isStrongPassword(newPassword)) {
+      return res.status(401).send("Enter a strong password");
     }
 
     //Hash new password
@@ -64,15 +74,13 @@ profileRouter.patch("/profile/edit/password", userAuth, async (req,res) => {
     // console.log(passwordHash)
     req.user.password = passwordHash;
 
-    await req.user.save()
+    await req.user.save();
 
     return res.send("Password Updated Successfully");
-
-  }catch(err) {
-    console.error(err)
-    res.status(400).send("Uh oh! Something feels wrong: "+ err.message);
+  } catch (err) {
+    console.error(err);
+    res.status(400).send("Uh oh! Something feels wrong: " + err.message);
   }
-})
+});
 
-
-module.exports = profileRouter
+module.exports = profileRouter;
