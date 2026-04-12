@@ -1,7 +1,3 @@
-To create a professional README for **DevTinder**, you need to balance technical depth with clear navigation. Below is the complete Markdown code for your GitHub repository.
-
-***
-
 # DevTinder – Developer Networking Platform 👨‍💻🔥
 
 DevTinder is a specialized networking application designed for developers to connect, collaborate, and build a community. Think of it as "Tinder for Developers"—where you can swipe through profiles, view tech stacks, and connect with like-minded engineers.
