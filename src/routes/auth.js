@@ -38,8 +38,8 @@ authRouter.post("/signup", async (req, res) => {
 
     // ✅ Set cookie
     res.cookie("token", token, {
+      expires: new Date(Date.now() + 3600000),
       httpOnly: true,
-
       secure: false, // true only in production (HTTPS)
       sameSite: "lax", // NOT "strict" locally
     });
