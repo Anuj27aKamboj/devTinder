@@ -7,7 +7,18 @@ const cors = require("cors");
 const app = express();
 
 app.use(cors({
-  origin: "http://3.26.43.77",
+  origin: function (origin, callback) {
+    const allowedOrigins = [
+      "http://localhost:5173",
+      "http://3.26.43.77"
+    ];
+    
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
   credentials: true,
 }));
 app.use(express.json());
