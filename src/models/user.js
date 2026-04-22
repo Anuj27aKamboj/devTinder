@@ -120,7 +120,7 @@ userSchema.methods.getJWT = async function () {
   //Never use arrow functions in schema methods
   const userPresent = this;
 
-  const token = await jwt.sign({ _id: userPresent._id }, "DEV@TINDER$123", {
+  const token = await jwt.sign({ _id: userPresent._id }, process.env.JWT_SECRET_KEY, {
     expiresIn: "1h",
   });
 

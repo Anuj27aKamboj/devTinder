@@ -10,7 +10,7 @@ const userAuth = async (req, res, next) => {
 
     let decodedObj;
     try {
-      decodedObj = jwt.verify(token, "DEV@TINDER$123");
+      decodedObj = jwt.verify(token, process.env.JWT_SECRET_KEY);
     } catch {
       throw new Error("Invalid or expired token");
     }
