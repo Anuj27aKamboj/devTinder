@@ -1,3 +1,4 @@
+require("dotenv").config();
 const express = require("express");
 const connectDb = require("./config/database");
 const User = require("./models/user");
@@ -7,7 +8,6 @@ const http = require("http");
 const initializeSocket = require("./utils/sockets");
 
 const app = express();
-require("dotenv").config();
 
 const allowedOrigins = ["http://localhost:5173", "http://3.26.43.77"];
 
