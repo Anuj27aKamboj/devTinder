@@ -38,10 +38,10 @@ authRouter.post("/signup", async (req, res) => {
     const token = await user.getJWT();
 
     res.cookie("token", token, {
-      expires: new Date(Date.now() + 3600000),
+      expires: new Date(Date.now() + 1 * 24 * 60 * 60 * 1000),
       httpOnly: true,
       secure: isProduction,
-      sameSite: isProduction ? "None" : "Lax",
+      sameSite:"Lax",
     });
 
     res.status(201).json({
@@ -72,10 +72,10 @@ authRouter.post("/login", async (req, res) => {
 
       //Add token to the cookie and send response back to the user
       res.cookie("token", token, {
-      expires: new Date(Date.now() + 3600000),
+      expires: new Date(Date.now() + 1 * 24 * 60 * 60 * 1000),
       httpOnly: true,
       secure: isProduction,
-      sameSite: isProduction ? "None" : "Lax",
+      sameSite:"Lax",
     });
 
       // user = user.select(USER_SAFE_DATA);
