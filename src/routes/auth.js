@@ -8,6 +8,8 @@ const bcrypt = require("bcrypt");
 
 const authRouter = express.Router();
 
+const isProduction = process.env.NODE_ENV === "production";
+
 authRouter.post("/signup", async (req, res) => {
   //Creating a new instance of user model
   // const user = new User({
@@ -29,22 +31,19 @@ authRouter.post("/signup", async (req, res) => {
       lastName,
       emailId,
       password: passwordHash,
-    }); //Creating a new instance
+    });
 
     await user.save();
 
-    // ✅ Generate token
     const token = await user.getJWT();
 
-    // ✅ Set cookie
     res.cookie("token", token, {
       expires: new Date(Date.now() + 3600000),
       httpOnly: true,
-      secure: false, // true only in production (HTTPS)
-      sameSite: "lax", // NOT "strict" locally
+      secure: isProduction,
+      sameSite: isProduction ? "None" : "Lax",
     });
 
-    // ✅ Send response
     res.status(201).json({
       message: "User created successfully",
       user: user.getSafeData(),
@@ -73,11 +72,11 @@ authRouter.post("/login", async (req, res) => {
 
       //Add token to the cookie and send response back to the user
       res.cookie("token", token, {
-        expires: new Date(Date.now() + 3600000),
-        httpOnly: true,
-        secure: false, // ❗ required for localhost
-        sameSite: "lax", // ❗ allow cross-origin (React ↔ backend)
-      });
+      expires: new Date(Date.now() + 3600000),
+      httpOnly: true,
+      secure: isProduction,
+      sameSite: isProduction ? "None" : "Lax",
+    });
 
       // user = user.select(USER_SAFE_DATA);
       res.json({
